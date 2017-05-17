@@ -30,6 +30,7 @@ var MetaUrl = AdminUrlPrefix + '/models'
 var labelColumns = 1
 
 var resolveFolder = function (folder, routes, pathPrefix) {
+
   folder.files.forEach(function(file) {
     var model = file.data
     var path = pathPrefix + '/' + file.name // /models/history
@@ -108,28 +109,97 @@ var resolveFolder = function (folder, routes, pathPrefix) {
 }
 
 var router = new VueRouter()
-var created = function () {
-  console.log('admin.vue created')
-  var self = this
-  self.$http.get(MetaUrl).then(
-    function(response){
-      self.modelFolder = response.body
-      var routes = []
-      var root = {name:'root', files:[], folders:[self.modelFolder]}
-      resolveFolder(root, routes, '')
-      routes.push({path:'/', redirect:'/models'})
-      self.$router.addRoutes(routes)
-    },
-    function(response){
-      this.error = 'Server error when fetching data' 
+var dataF = {
+  "files": [
+    {
+      "name": "profile",
+      "data": {
+        "form_field_names": [
+          "family"
+        ],
+        "fields": {
+          "family": {
+            "columns": [
+              "姓名",
+              "年龄"
+            ],
+            "label": "家庭成员",
+            "subfields": [
+              {
+                "parentName": "family",
+                "label": "姓名",
+                "attrs": {
+                  "max_length": 4,
+                  "name": "name",
+                  "type": "text"
+                },
+                "tag_name": "input",
+                "name": "name",
+                "type": "varchar"
+              },
+              {
+                "parentName": "family",
+                "label": "年龄",
+                "attrs": {
+                  "max": 100,
+                  "name": "age",
+                  "type": "number"
+                },
+                "tag_name": "input",
+                "name": "age",
+                "type": "integer"
+              }
+            ],
+            "attrs": {
+              "max_length": 300,
+              "required": true,
+              "name": "family",
+              "type": "text"
+            },
+            "tag_name": "row",
+            "name": "family",
+            "type": "row"
+          },
+          "id": {
+            "label": "id",
+            "attrs": {
+              "name": "id",
+              "type": "number"
+            },
+            "tag_name": "input",
+            "name": "id",
+            "type": "integer"
+          }
+        },
+        "list_field_names": [
+          "id",
+          "family"
+        ],
+        "initials":         {},
+        "columns": [
+          "id",
+          "家庭成员"
+        ],
+        "table_name": "homestats"
+      }
     }
-  );      
+  ],
+  "name": "models",
+  "folders":  []
 }
+
 
 export default { 
   router: router, 
-  created: created,
-  mounted: function () {console.log('admin.vue mounted')},
+  // created: created,
+    mounted: function () {
+    this.modelFolder = dataF
+    var routes = []
+    var root = {name:'root', files:[], folders:[this.modelFolder]}
+    resolveFolder(root, routes, '')
+    routes.push({path:'/', redirect:'/models'})
+    this.$router.addRoutes(routes)
+  },
   data: function () {
     return {
       modelFolder: null,
